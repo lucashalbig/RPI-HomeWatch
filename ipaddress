@@ -1,0 +1,24 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+from subprocess import check_output
+import re
+
+lines = check_output(['ifconfig']).split('\n')
+
+ips = []
+
+for line in lines:
+	if line.strip().startswith('inet'):
+		x = re.search('inet ([^ ]+) .+', line.strip())
+		if x:
+			ip = x.group(1)
+			if ip != '127.0.0.1':
+				ips.append(ip)
+if len(ips) > 0:
+	if len(ips) > 1:
+		print 'Sie können eine der folgenden IPs verwenden:'
+	else:
+		print 'Dies ist ihre IP:'
+	for IP in ips:
+		print IP

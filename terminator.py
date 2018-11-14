@@ -20,14 +20,15 @@ def getpid(name = TEST_PNAME):
                     il_.append(prop)
             
             if il_ != []:
-                user, pid, ppid, c, stime, tty, time, cmd = il_
+                user, pid, ppid, c, stime, tty, time = il_[:7]
+                cmd = ' '.join(il_[7:])
                 return int(pid), ''
             
     except CalledProcessError as e:
         return None, f'{name!r} nicht gefunden'
 
 def handlepg(name = TEST_PNAME, mode = 'term'):
-    pid, err = getpid()
+    pid, err = getpid(name = name)
     if pid != None:
         try:
             kill(pid, SIGTERM)

@@ -68,6 +68,8 @@ Um den Raspberry Pi auch nachher ohne Maus und Tastatur angeschlossen steuern zu
 Wir wollen im Beispiel mal demonstrieren, wie beides geht. <br />
 Aktivieren Sie wie im Bild also SSH und VNC.
 
+![Raspbian Config Enable VNCnSSH](http://justpic.info/images4/d076/2018110115_15_58192.168.1.22raspberrypiVNCViewer.png)
+
 Bestätigen Sie die Änderungen mit „OK“
 Nun können Sie die grafische Oberfläche mit einem VNC-Client ansteuern und textbasierte Befehle via SSH-Client.
 Für Windows, empfehlen sich:
@@ -86,7 +88,10 @@ Es gibt im Stammverzeichnis des Projekts eine Datei mit dem Namen motionmagic.py
 Diese Datei sorgt dafür, dass Sie unter der untenstehenden Voraussetzung das Überwachungs-Programm motion auch von unterwegs steuern können. <br />
 Sollten Sie diese verwenden wollen ist es erforderlich, dass der aktive Benutzer auf dem Raspberry Pi root (Admin-) Rechte hat, die ohne Passworteingabe erfolgen. <br />
 Hierbei muss folgende die Rechte-Datei bearbeitet werden. <br />
-Sie fangen eine Bearbeitung mit dem Befehl sudo visudo an. <br />
+Sie fangen eine Bearbeitung mit dem Befehl sudo visudo an.
+
+![Raspbian visudo](http://justpic.info/images4/b977/2018110708_08_33192.168.1.22raspberrypiVNCViewer.png)
+
 Die Zeile unter #User privileges specification soll exact so aussehen wie im Bild. <br />
 Mit Strg+O speichern sie die Datei und mit Strg+X verlassen Sie den Bearbeitungs-Modus… <br />
 Wenn nun auf einen neuen Befehl gewartet wird haben Sie alles richtig gemacht, <br />

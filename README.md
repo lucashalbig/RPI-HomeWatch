@@ -92,7 +92,7 @@ Sie fangen eine Bearbeitung mit dem Befehl sudo visudo an.
 
 ![Raspbian visudo](http://justpic.info/images4/b977/2018110708_08_33192.168.1.22raspberrypiVNCViewer.png)
 
-Die Zeile unter #User privileges specification soll exact so aussehen wie im Bild. <br />
+Die Zeile unter `#User privileges specification` soll exact so aussehen wie im Bild. <br />
 Mit Strg+O speichern sie die Datei und mit Strg+X verlassen Sie den Bearbeitungs-Modus… <br />
 Wenn nun auf einen neuen Befehl gewartet wird haben Sie alles richtig gemacht, <br />
 liest man stattdessen u.a. „Was jetzt?“ steht, brechen Sie den endgültigen Speichervorgang mit „x“ (Bestätigung mit Enter-Taste) ab.

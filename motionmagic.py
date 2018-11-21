@@ -278,9 +278,6 @@ def voice_message_handeling(bot, update):
 			break
 	if not theoryWorked:
 		msg.reply_text('Befehl nicht erkant')
-	
-
-			
 
 dispatcher.add_handler(MessageHandler(Filters.voice, voice_message_handeling))
 

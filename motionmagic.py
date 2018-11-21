@@ -14,7 +14,7 @@ import sys
 from os import popen
 import requests
 from requests.auth import HTTPBasicAuth
-
+import itertools
 
 
 IPs = getIPs()
@@ -231,8 +231,8 @@ dispatcher.add_handler(CallbackQueryHandler(CBQ))
 
 
 def voice_message_handeling(bot, update):
+	commands = ['starten','beenden','foto','video','magie beenden']
 	msg = update.message
-	voice = msg.voice
 	voice = msg.voice
 	file = voice.get_file()
 	x = file.download_as_bytearray()
@@ -243,22 +243,39 @@ def voice_message_handeling(bot, update):
 	r.raise_for_status()
 	jso = r.json()
 	result = jso['results'][0]
-	alt = result['alternatives'][0]
-	text = alt['transcript'].strip()
-	msg.reply_text(f'*Analysed text*\n{text}', parse_mode = 'Markdown', quote = True)
-	if text in ['starten','beenden','foto','video']:
-		if text == 'starten':
-			startMotion(bot, update)
-		elif text == 'beenden':
-			termMotion(bot, update)
-		elif text == 'foto':
-			sendImage(bot, update)
-		elif text == 'video':
-			sendVideo(bot, update)
-		elif text == 'magie beenden':
-			updater.idle()
-	else:
-		msg.reply_text('Befehl nicht erkant')
+	
+	word_alts = result['word_alternatives']
+	Aalternatives = []
+	for word_alt in word_alts:
+		alternatives = word_alt['alternatives']
+		real_word_alts = []
+		for alternative in alternatives:
+			real_word_alts.append(alternative['word'])
+		Aalternatives.append(real_word_alts)
+	it_prod = itertools.product(*Aalternatives)
+	x = list(it_prod)
+	
+	theories = []
+	for a in x:
+		b = ' '.join(a)
+		theories.append(b)
+
+	for theory in theories:
+		if theory in commands:
+			msg.reply_text(f'*Analysed command text*\n{text}', parse_mode = 'Markdown', quote = True)
+			if theory == 'starten':
+				startMotion(bot, update)
+			elif theory == 'beenden':
+				termMotion(bot, update)
+			elif theory == 'foto':
+				sendImage(bot, update)
+			elif theory == 'video':
+				sendVideo(bot, update)
+			elif theory == 'magie beenden':
+				updater.idle()
+			break
+		else:
+			msg.reply_text('Befehl nicht erkant')
 	
 
 			

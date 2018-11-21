@@ -48,11 +48,16 @@ def isRunning(name = 'motion'):
 def start(bot, update):
     update.message.reply_text('Willkommen beim Motion-Überwachungs-Kontrollzentrum.\n\
 Hier können Sie Ihr Überwachungssystem aus der Ferne steuern.\n\
+Ich bin MoRo und ich führe Sie durch das System\n\Wenn Sie nett zu mir sind und aufmerksam lesen dann bin ich auch nett zu Ihnen,\n\
+sollten Sie Hinweise überlesen und mich ignorieren kann ich auch schnell unfreundlich werden.\n\
+Aber weil Sie mich gekauft haben weise ich Sie im Zweifelsfall eben noch einmal drauf hin\n\n\
 Um das System zu starten senden Sie /startMotion\n\
 und um das System zu beenden senden Sie /termMotion\n\n\
 Wollen Sie ein aktuelles Bild auf ihr Handy gesendet haben, schicken Sie /sendImage\n\
-und wenn Sie ein Video aufzeichnen möchten, dann fangen Sie mit /sendVideo an und folgen den Anweisungen.\n\
-(Es ist anzumerken, dass bei diesen Befehlen das Programm motion unterbrochen wird und somit jegliche Überwachung bis zum manuellen Neustart (via /startMotion) unterbrochen ist...)')
+und wenn Sie ein Video aufzeichnen möchten, dann fangen Sie mit /sendVideo an und folgen den Anweisungen.\n\n\
+(Es ist anzumerken, dass bei diesen Befehlen das Programm motion unterbrochen wird und somit jegliche Überwachung bis zum manuellen Neustart (via /startMotion) unterbrochen ist...)\n\
+Für ganz Pfiffige kann man einen sogen. EXPERTENMODUS aktivieren, via /activateExpertMode, dieser bringt allerdings keine großen Verbesserungen gegnüber der sonst betriebenen Version.\n\
+Er bietet lediglich bei der Spracherkennung mehr Infos bei Fehlschlag an. Normalerweise also keine Verbesserung.')
 dispatcher.add_handler(CommandHandler('start', start))
 
 #~ Beim Botbefehl /startMotion started das Programm, wenn es nicht bereits ausgeführt wird
@@ -151,6 +156,7 @@ dispatcher.add_handler(CommandHandler('sendVideo', sendVideo))
 
 def message_handeling(bot, update):
     msg = update.message
+    #~ print(msg)
     replied_msg = msg.reply_to_message
     if replied_msg:
         msg_reply_text = replied_msg.text
@@ -180,6 +186,12 @@ def message_handeling(bot, update):
                     keyboard = [[InlineKeyboardButton('Bestätigen', callback_data = f'CONFIRMvid_{SUM_seconds}')]]
                     msg.reply_text(f'Bestätgen Sie die folgende Zeitangabe *{msg.text}* ({SUM_seconds} Sekunden)', 
                         parse_mode = 'Markdown', reply_markup = InlineKeyboardMarkup(keyboard))
+                else:
+                    update.message.reply_text('\
+Sagen Sie mal, verstehen Sie die deutsche Sprache nicht\n\
+oder wissen Sie nicht, wie ein Roboter funktioniert oder was?\n\
+Mir gehen hier langsam die Ideen aus.\nIch schreibe Ihnen nicht umsonst\
+eine schöne Erklärung welches Format ich brauche. Und Sie, sie Ignorant?')
             
 
 dispatcher.add_handler(MessageHandler(Filters.text, message_handeling))
@@ -229,6 +241,17 @@ def CBQ(bot, update):
     
 dispatcher.add_handler(CallbackQueryHandler(CBQ))
 
+def sendBatch(message, update):
+	tmp_msg = ''
+	tmp_msg_parts = message.split('\n')
+	for tmp_msg_part in tmp_msg_parts:
+		if (len(tmp_msg) + len(tmp_msg_part+'\n')) < 4096:
+			tmp_msg += tmp_msg_part + '\n'
+		else:
+			update.message.reply_text(tmp_msg)
+			tmp_msg = tmp_msg_part+ '\n'
+	#~ tmp_msg != '':
+	update.message.reply_text(tmp_msg)
 
 def voice_message_handeling(bot, update):
 	commands = ['starten','beenden','foto','video','magie beenden']
@@ -238,10 +261,11 @@ def voice_message_handeling(bot, update):
 	x = file.download_as_bytearray()
 	auth = HTTPBasicAuth('apikey', '6ZQckyY_kEgJPG8Jr7bNeH52HXXKbYPbSkxjp9QDF4sd')
 	print('Requesting recognition...')
-	r = requests.post('https://gateway-syd.watsonplatform.net/speech-to-text/api/v1/recognize?model=de-DE_BroadbandModel', 
+	r = requests.post('https://gateway-syd.watsonplatform.net/speech-to-text/api/v1/recognize?model=de-DE_BroadbandModel&word_alternatives_threshold=0.0', 
 		data = x, headers = {'Accept':'application/json','Content-Type': 'audio/ogg'}, auth = auth)
 	r.raise_for_status()
 	jso = r.json()
+	print(jso)
 	result = jso['results'][0]
 	
 	word_alts = result['word_alternatives']
@@ -250,8 +274,11 @@ def voice_message_handeling(bot, update):
 		alternatives = word_alt['alternatives']
 		real_word_alts = []
 		for alternative in alternatives:
-			real_word_alts.append(alternative['word'])
-		Aalternatives.append(real_word_alts)
+			word = alternative['word']
+			if word not in ['%','%%','<eps>','[pause]','[silence]']:
+				real_word_alts.append(word)
+		if real_word_alts != []:
+			Aalternatives.append(real_word_alts)
 	it_prod = itertools.product(*Aalternatives)
 	x = list(it_prod)
 	
@@ -264,7 +291,7 @@ def voice_message_handeling(bot, update):
 	for theory in theories:
 		if theory in commands:
 			theoryWorked = True
-			msg.reply_text(f'*Analysed command text*\n{text}', parse_mode = 'Markdown', quote = True)
+			msg.reply_text(f'*Analysierter Befehl*\n{theory}', parse_mode = 'Markdown', quote = True)
 			if theory == 'starten':
 				startMotion(bot, update)
 			elif theory == 'beenden':
@@ -274,10 +301,12 @@ def voice_message_handeling(bot, update):
 			elif theory == 'video':
 				sendVideo(bot, update)
 			elif theory == 'magie beenden':
-				updater.idle()
+				updater.stop()
 			break
 	if not theoryWorked:
-		msg.reply_text('Befehl nicht erkant')
+		text = 'Befehl nicht erkant\n\n\
+Stattdessen wurden folgende Möglichkeiten erkannt:\n'+'\n'.join(theories)
+		sendBatch(text, update)
 
 dispatcher.add_handler(MessageHandler(Filters.voice, voice_message_handeling))
 

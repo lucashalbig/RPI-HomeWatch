@@ -96,3 +96,8 @@ Die Zeile unter `#User privileges specification` soll exact so aussehen wie im B
 Mit Strg+O speichern sie die Datei und mit Strg+X verlassen Sie den Bearbeitungs-Modus… <br />
 Wenn nun auf einen neuen Befehl gewartet wird haben Sie alles richtig gemacht, <br />
 liest man stattdessen u.a. „Was jetzt?“ steht, brechen Sie den endgültigen Speichervorgang mit „x“ (Bestätigung mit Enter-Taste) ab.
+
+
+## Beispiel-Bildatei
+![Cam-Img](shot.jpg)
+![Cam-Img](shot.jpg)

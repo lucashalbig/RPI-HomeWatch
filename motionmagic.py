@@ -259,9 +259,11 @@ def voice_message_handeling(bot, update):
 	for a in x:
 		b = ' '.join(a)
 		theories.append(b)
-
+	
+	theoryWorked = False
 	for theory in theories:
 		if theory in commands:
+			theoryWorked = True
 			msg.reply_text(f'*Analysed command text*\n{text}', parse_mode = 'Markdown', quote = True)
 			if theory == 'starten':
 				startMotion(bot, update)
@@ -274,8 +276,8 @@ def voice_message_handeling(bot, update):
 			elif theory == 'magie beenden':
 				updater.idle()
 			break
-		else:
-			msg.reply_text('Befehl nicht erkant')
+	if not theoryWorked:
+		msg.reply_text('Befehl nicht erkant')
 	
 
 			
